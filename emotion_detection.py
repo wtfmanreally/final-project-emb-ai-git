@@ -58,3 +58,47 @@ def emotion_detector(text_to_analyse: str):
         }
 
     return emotion_scores
+
+import requests
+import json
+
+def emotion_detector(text_to_analyze):
+    """
+    Sends text to the Watson NLP service, extracts emotion scores,
+    and determines the dominant emotion.
+    """
+    url = 'https://sn-watson-emotion.labs.skills.network/v1/watson.runtime.nlp.v1/NlpService/EmotionPredict'
+    header = {"NOTEBOOK_ID": "Your_Notebook_ID"}
+    myobj = { "raw_document": { "text": text_to_analyze } }
+    
+    # Send the request to Watson NLP
+    response = requests.post(url, json=myobj, headers=header)
+    
+    # Task 3: Convert the response into a dictionary using the json library
+    formatted_response = json.loads(response.text)
+    
+    # Extract the emotion scores
+    # Structure: ['emotionPredictions'][0]['emotion']
+    emotions = formatted_response['emotionPredictions'][0]['emotion']
+    
+    # Separate scores for ease of calculation
+    anger_score = emotions['anger']
+    disgust_score = emotions['disgust']
+    fear_score = emotions['fear']
+    joy_score = emotions['joy']
+    sadness_score = emotions['sadness']
+    
+    # Determine the dominant emotion (key with the highest value)
+    dominant_emotion = max(emotions, key=emotions.get)
+    
+    # Create the output dictionary in the required format
+    output = {
+        'anger': anger_score,
+        'disgust': disgust_score,
+        'fear': fear_score,
+        'joy': joy_score,
+        'sadness': sadness_score,
+        'dominant_emotion': dominant_emotion
+    }
+    
+    return output
